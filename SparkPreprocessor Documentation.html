@@ -1,0 +1,369 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#sparkpreprocessor-documentation">SparkPreprocessor Documentation</a>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#key-features">Key Features</a></li>
+<li><a href="#high-performance-architecture">High-Performance Architecture</a></li>
+<li><a href="#configuration-parameters">Configuration Parameters</a></li>
+<li><a href="#key-methods">Key Methods</a></li>
+<li><a href="#usage-example">Usage Example</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="sparkpreprocessor-documentation">SparkPreprocessor Documentation</h1>
+<h2 id="overview">Overview</h2>
+<p>SparkPreprocessor is a high-performance data preprocessing class for PySpark DataFrames, leveraging multithreading for optimal performance. It provides comprehensive data analysis, cleaning, and transformation capabilities while maintaining efficiency through parallel processing and intelligent thread management.</p>
+<h2 id="key-features">Key Features</h2>
+<ul>
+<li>High-performance multithreading with dynamic thread allocation</li>
+<li>Comprehensive data type detection and handling</li>
+<li>Advanced statistical analysis with caching</li>
+<li>Multiple correlation analysis methods</li>
+<li>Configurable data preprocessing pipeline</li>
+<li>Visualization capabilities</li>
+<li>Detailed reporting and profiling</li>
+</ul>
+<h2 id="high-performance-architecture">High-Performance Architecture</h2>
+<h3 id="multithreading-implementation">Multithreading Implementation</h3>
+<p>The class uses Python’s ThreadPoolExecutor for parallel processing with dynamic thread allocation based on:</p>
+<ul>
+<li>Available CPU cores</li>
+<li>Number of columns to process</li>
+<li>Data complexity</li>
+<li>System resources</li>
+</ul>
+<p>Thread count is optimized using the formula:</p>
+<pre class=" language-python"><code class="prism  language-python">optimal_threads <span class="token operator">=</span> <span class="token builtin">min</span><span class="token punctuation">(</span>
+    <span class="token builtin">max</span><span class="token punctuation">(</span>MIN_THREADS<span class="token punctuation">,</span> cpu_count <span class="token operator">*</span> multiplier<span class="token punctuation">)</span><span class="token punctuation">,</span>
+    MAX_THREADS<span class="token punctuation">,</span>
+    <span class="token builtin">max</span><span class="token punctuation">(</span>num_columns <span class="token operator">+</span> thread_buffer<span class="token punctuation">,</span> MIN_THREADS<span class="token punctuation">)</span>
+<span class="token punctuation">)</span>
+</code></pre>
+<h2 id="configuration-parameters">Configuration Parameters</h2>
+<h3 id="core-configuration-parameters">Core Configuration Parameters</h3>
+<h4 id="column-filtering">Column Filtering</h4>
+<ul>
+<li>
+<p><code>white_list</code>: List[str] | None</p>
+<ul>
+<li>Columns to include in processing</li>
+<li>Takes precedence over black_list if both are specified</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>black_list</code>: List[str] | None</p>
+<ul>
+<li>Columns to exclude from processing</li>
+<li>Ignored if white_list is specified</li>
+<li>Default: None</li>
+</ul>
+</li>
+</ul>
+<h4 id="scaling-configuration">Scaling Configuration</h4>
+<ul>
+<li><code>scaling_method</code>: ScalingMethod enum
+<ul>
+<li>Values:
+<ul>
+<li>STANDARD: Standardization (zero mean, unit variance)</li>
+<li>MINMAX: Min-max scaling to [0,1] range</li>
+<li>NONE: No scaling</li>
+</ul>
+</li>
+<li>Default: NONE</li>
+</ul>
+</li>
+</ul>
+<h4 id="null-handling">Null Handling</h4>
+<ul>
+<li>
+<p><code>null_strategy</code>: NullStrategy enum</p>
+<ul>
+<li>Values:
+<ul>
+<li>MEAN: Replace with column mean</li>
+<li>MEDIAN: Replace with column median</li>
+<li>MODE: Replace with most frequent value</li>
+<li>CONSTANT: Replace with specified value</li>
+<li>DROP: Remove rows with nulls</li>
+<li>FLAG: Add binary indicator for nulls</li>
+<li>NONE: No null handling</li>
+</ul>
+</li>
+<li>Default: NONE</li>
+</ul>
+</li>
+<li>
+<p><code>null_fill_value</code>: str | float | None</p>
+<ul>
+<li>Custom value for CONSTANT strategy</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>null_threshold</code>: float (0 to 1)</p>
+<ul>
+<li>Maximum allowed null percentage</li>
+<li>Columns exceeding this are dropped</li>
+<li>Default: 0.5</li>
+</ul>
+</li>
+</ul>
+<h4 id="outlier-handling">Outlier Handling</h4>
+<ul>
+<li>
+<p><code>outlier_strategy</code>: OutlierStrategy enum</p>
+<ul>
+<li>Values:
+<ul>
+<li>DROP: Remove outlier rows</li>
+<li>MEAN: Replace with column mean</li>
+<li>NEAREST: Replace with nearest bound</li>
+<li>NONE: No outlier handling</li>
+</ul>
+</li>
+<li>Default: NONE</li>
+</ul>
+</li>
+<li>
+<p><code>z_score</code>: float &gt; 0</p>
+<ul>
+<li>Z-score threshold for outlier detection</li>
+<li>Default: 3.0</li>
+</ul>
+</li>
+</ul>
+<h4 id="correlation-analysis">Correlation Analysis</h4>
+<ul>
+<li>
+<p><code>correlation_method</code>: CorrelationMethod enum</p>
+<ul>
+<li>Values:
+<ul>
+<li>PEARSON: Pearson correlation</li>
+<li>CHATTERJEE: Chatterjee’s correlation</li>
+<li>NONE: No correlation analysis</li>
+</ul>
+</li>
+<li>Default: NONE</li>
+</ul>
+</li>
+<li>
+<p><code>correlation_threshold</code>: float (0 to 1)</p>
+<ul>
+<li>Threshold for high correlation detection</li>
+<li>Default: 0.95</li>
+</ul>
+</li>
+</ul>
+<h4 id="categorical-data-handling">Categorical Data Handling</h4>
+<ul>
+<li>
+<p><code>max_cardinality_ratio</code>: float (0 to 1) | None</p>
+<ul>
+<li>Maximum unique values ratio</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>min_cardinality_ratio</code>: float (0 to 1) | None</p>
+<ul>
+<li>Minimum unique values ratio</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>cardinality_action</code>: str</p>
+<ul>
+<li>Values:
+<ul>
+<li>“group”: Group excess categories</li>
+<li>“drop”: Drop high-cardinality columns</li>
+</ul>
+</li>
+<li>Default: “group”</li>
+</ul>
+</li>
+<li>
+<p><code>other_label</code>: str</p>
+<ul>
+<li>Label for grouped categories</li>
+<li>Default: “OTHER”</li>
+</ul>
+</li>
+</ul>
+<h4 id="feature-engineering">Feature Engineering</h4>
+<ul>
+<li>
+<p><code>enable_polynomial_features</code>: bool</p>
+<ul>
+<li>Enable polynomial feature generation</li>
+<li>Default: False</li>
+</ul>
+</li>
+<li>
+<p><code>polynomial_degree</code>: int &gt; 0</p>
+<ul>
+<li>Degree for polynomial features</li>
+<li>Default: 2</li>
+</ul>
+</li>
+<li>
+<p><code>enable_interaction_terms</code>: bool</p>
+<ul>
+<li>Enable feature interaction terms</li>
+<li>Default: False</li>
+</ul>
+</li>
+</ul>
+<h4 id="text-processing">Text Processing</h4>
+<ul>
+<li>
+<p><code>standardize_text</code>: bool</p>
+<ul>
+<li>Enable text standardization</li>
+<li>Default: True</li>
+</ul>
+</li>
+<li>
+<p><code>text_columns</code>: List[str] | None</p>
+<ul>
+<li>Columns to treat as text</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>text_avg_length_threshold</code>: int &gt; 0</p>
+<ul>
+<li>Average length threshold for text classification</li>
+<li>Default: 50</li>
+</ul>
+</li>
+<li>
+<p><code>text_max_length_threshold</code>: int &gt; 0</p>
+<ul>
+<li>Maximum length threshold for text classification</li>
+<li>Default: 200</li>
+</ul>
+</li>
+<li>
+<p><code>text_uniqueness_ratio</code>: float (0 to 1)</p>
+<ul>
+<li>Uniqueness ratio threshold for text classification</li>
+<li>Default: 0.8</li>
+</ul>
+</li>
+<li>
+<p><code>text_min_length</code>: int &gt; 0</p>
+<ul>
+<li>Minimum length for text classification</li>
+<li>Default: 20</li>
+</ul>
+</li>
+</ul>
+<h4 id="processing-control">Processing Control</h4>
+<ul>
+<li><code>no_process</code>: List[str] | None
+<ul>
+<li>Columns to exclude from processing</li>
+<li>Default: None</li>
+</ul>
+</li>
+</ul>
+<h4 id="encoding">Encoding</h4>
+<ul>
+<li>
+<p><code>encode</code>: List[str] | None</p>
+<ul>
+<li>Columns to encode</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>encode_method</code>: str | None</p>
+<ul>
+<li>Values:
+<ul>
+<li>“ohe”: One-hot encoding</li>
+<li>“binary”: Binary encoding</li>
+</ul>
+</li>
+<li>Default: None</li>
+</ul>
+</li>
+<li>
+<p><code>explode_columns</code>: bool</p>
+<ul>
+<li>Split encoded columns into separate features</li>
+<li>Default: False</li>
+</ul>
+</li>
+</ul>
+<h2 id="key-methods">Key Methods</h2>
+<h3 id="core-methods">Core Methods</h3>
+<pre class=" language-python"><code class="prism  language-python">fit<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> column_overrides<span class="token punctuation">:</span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">,</span> config<span class="token punctuation">:</span> Dict <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+transform<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> config<span class="token punctuation">:</span> Dict <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> DataFrame
+fit_transform<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> column_overrides<span class="token punctuation">:</span> Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">,</span> config<span class="token punctuation">:</span> Dict <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> DataFrame
+</code></pre>
+<h3 id="analysis-methods">Analysis Methods</h3>
+<pre class=" language-python"><code class="prism  language-python">display_summary<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">,</span> table_format<span class="token operator">=</span><span class="token string">'pretty'</span><span class="token punctuation">)</span>
+plot_distribution<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> column<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">,</span> plot_type<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">=</span> <span class="token string">'both'</span><span class="token punctuation">,</span> num_bins<span class="token punctuation">:</span> <span class="token builtin">int</span> <span class="token operator">=</span> <span class="token number">30</span><span class="token punctuation">)</span>
+plot_correlation_matrix<span class="token punctuation">(</span>correlation_matrix<span class="token punctuation">:</span> np<span class="token punctuation">.</span>ndarray <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span>
+plot_missing_values<span class="token punctuation">(</span><span class="token punctuation">)</span>
+generate_profile_report<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> output_path<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> <span class="token builtin">str</span>
+</code></pre>
+<h3 id="statistical-methods">Statistical Methods</h3>
+<pre class=" language-python"><code class="prism  language-python">calculate_correlation_matrix<span class="token punctuation">(</span>df<span class="token punctuation">:</span> DataFrame<span class="token punctuation">,</span> correlation_method<span class="token punctuation">:</span> <span class="token builtin">str</span> <span class="token operator">=</span> <span class="token string">'default'</span><span class="token punctuation">,</span> numeric_cols<span class="token punctuation">:</span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> np<span class="token punctuation">.</span>ndarray
+get_correlation_matrix<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> Optional<span class="token punctuation">[</span>Tuple<span class="token punctuation">[</span>np<span class="token punctuation">.</span>ndarray<span class="token punctuation">,</span> List<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token builtin">str</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+get_high_correlations<span class="token punctuation">(</span>threshold<span class="token punctuation">:</span> <span class="token builtin">float</span> <span class="token operator">=</span> <span class="token boolean">None</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">&gt;</span> List<span class="token punctuation">[</span>Dict<span class="token punctuation">[</span><span class="token builtin">str</span><span class="token punctuation">,</span> Any<span class="token punctuation">]</span><span class="token punctuation">]</span>
+</code></pre>
+<h3 id="configuration-management">Configuration Management</h3>
+<pre class=" language-python"><code class="prism  language-python">save_config<span class="token punctuation">(</span>path<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span>
+load_config<span class="token punctuation">(</span>path<span class="token punctuation">:</span> <span class="token builtin">str</span><span class="token punctuation">)</span>
+</code></pre>
+<h2 id="usage-example">Usage Example</h2>
+<pre class=" language-python"><code class="prism  language-python"><span class="token keyword">from</span> pyspark<span class="token punctuation">.</span>sql <span class="token keyword">import</span> SparkSession
+
+<span class="token comment"># Initialize Spark</span>
+spark <span class="token operator">=</span> SparkSession<span class="token punctuation">.</span>builder<span class="token punctuation">.</span>getOrCreate<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment"># Create configuration</span>
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'standard'</span><span class="token punctuation">,</span>
+    <span class="token string">'null_strategy'</span><span class="token punctuation">:</span> <span class="token string">'mean'</span><span class="token punctuation">,</span>
+    <span class="token string">'outlier_strategy'</span><span class="token punctuation">:</span> <span class="token string">'nearest'</span><span class="token punctuation">,</span>
+    <span class="token string">'correlation_method'</span><span class="token punctuation">:</span> <span class="token string">'pearson'</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment"># Initialize preprocessor</span>
+preprocessor <span class="token operator">=</span> SparkPreprocessor<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span>
+
+<span class="token comment"># Fit and transform data</span>
+df_transformed <span class="token operator">=</span> preprocessor<span class="token punctuation">.</span>fit_transform<span class="token punctuation">(</span>df<span class="token punctuation">)</span>
+</code></pre>
+
+    </div>
+  </div>
+</body>
+
+</html>

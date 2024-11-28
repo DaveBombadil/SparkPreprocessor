@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="sparkpreprocessor-configuration-examples">SparkPreprocessor Configuration Examples</h1>
+<h2 id="common-use-cases">Common Use Cases</h2>
+<h3 id="basic-data-cleaning">Basic Data Cleaning</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'null_strategy'</span><span class="token punctuation">:</span> <span class="token string">'mean'</span><span class="token punctuation">,</span>
+
+<span class="token string">'outlier_strategy'</span><span class="token punctuation">:</span> <span class="token string">'nearest'</span><span class="token punctuation">,</span>
+
+<span class="token string">'standardize_text'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+
+<span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'standard'</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Handles missing values, outliers, standardizes text fields, and scales numeric features.</p>
+<h3 id="high-cardinality-categorical-handling">High-Cardinality Categorical Handling</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'max_cardinality_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.05</span><span class="token punctuation">,</span>
+
+<span class="token string">'cardinality_action'</span><span class="token punctuation">:</span> <span class="token string">'group'</span><span class="token punctuation">,</span>
+
+<span class="token string">'other_label'</span><span class="token punctuation">:</span> <span class="token string">'MISC'</span><span class="token punctuation">,</span>
+
+<span class="token string">'encode_method'</span><span class="token punctuation">:</span> <span class="token string">'ohe'</span><span class="token punctuation">,</span>
+
+<span class="token string">'explode_columns'</span><span class="token punctuation">:</span> <span class="token boolean">True</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Groups categories that make up less than 5% of data, encodes using one-hot encoding, and creates separate columns for each category.</p>
+<h3 id="text-heavy-processing">Text-Heavy Processing</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'text_avg_length_threshold'</span><span class="token punctuation">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
+
+<span class="token string">'text_max_length_threshold'</span><span class="token punctuation">:</span> <span class="token number">500</span><span class="token punctuation">,</span>
+
+<span class="token string">'text_uniqueness_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.9</span><span class="token punctuation">,</span>
+
+<span class="token string">'text_min_length'</span><span class="token punctuation">:</span> <span class="token number">30</span><span class="token punctuation">,</span>
+
+<span class="token string">'standardize_text'</span><span class="token punctuation">:</span> <span class="token boolean">True</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Optimized for datasets with substantial text content, identifying and processing text columns based on length and uniqueness characteristics.</p>
+<h3 id="high-performance-analysis">High-Performance Analysis</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'correlation_method'</span><span class="token punctuation">:</span> <span class="token string">'pearson'</span><span class="token punctuation">,</span>
+
+<span class="token string">'correlation_threshold'</span><span class="token punctuation">:</span> <span class="token number">0.8</span><span class="token punctuation">,</span>
+
+<span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'standard'</span><span class="token punctuation">,</span>
+
+<span class="token string">'enable_polynomial_features'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+
+<span class="token string">'polynomial_degree'</span><span class="token punctuation">:</span> <span class="token number">2</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Focuses on feature relationships and engineering, suitable for predictive modeling preparation.</p>
+<h3 id="memory-optimized-processing">Memory-Optimized Processing</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'max_cardinality_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.01</span><span class="token punctuation">,</span>
+
+<span class="token string">'cardinality_action'</span><span class="token punctuation">:</span> <span class="token string">'drop'</span><span class="token punctuation">,</span>
+
+<span class="token string">'encode_method'</span><span class="token punctuation">:</span> <span class="token string">'binary'</span><span class="token punctuation">,</span>
+
+<span class="token string">'explode_columns'</span><span class="token punctuation">:</span> <span class="token boolean">False</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Minimizes memory usage by dropping high-cardinality columns and using binary encoding.</p>
+<h3 id="strict-data-quality">Strict Data Quality</h3>
+<pre class=" language-python"><code class="prism  language-python">
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'null_threshold'</span><span class="token punctuation">:</span> <span class="token number">0.1</span><span class="token punctuation">,</span>
+
+<span class="token string">'null_strategy'</span><span class="token punctuation">:</span> <span class="token string">'drop'</span><span class="token punctuation">,</span>
+
+<span class="token string">'outlier_strategy'</span><span class="token punctuation">:</span> <span class="token string">'drop'</span><span class="token punctuation">,</span>
+
+<span class="token string">'correlation_threshold'</span><span class="token punctuation">:</span> <span class="token number">0.95</span><span class="token punctuation">,</span>
+
+<span class="token string">'min_cardinality_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.001</span><span class="token punctuation">,</span>
+
+<span class="token string">'max_cardinality_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.1</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<p>Enforces strict data quality by removing problematic data points, highly correlated features, and maintaining reasonable cardinality ranges.</p>
+<h2 id="parameter-combinations-and-effects">Parameter Combinations and Effects</h2>
+<h3 id="scaling-and-correlation-analysis">Scaling and Correlation Analysis</h3>
+<pre class=" language-python"><code class="prism  language-python">
+<span class="token comment"># Enhanced feature relationship analysis</span>
+
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'standard'</span><span class="token punctuation">,</span>
+
+<span class="token string">'correlation_method'</span><span class="token punctuation">:</span> <span class="token string">'chatterjee'</span><span class="token punctuation">,</span>
+
+<span class="token string">'correlation_threshold'</span><span class="token punctuation">:</span> <span class="token number">0.7</span>
+
+<span class="token punctuation">}</span>
+
+  
+
+<span class="token comment"># Robust outlier detection</span>
+
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'minmax'</span><span class="token punctuation">,</span>
+
+<span class="token string">'outlier_strategy'</span><span class="token punctuation">:</span> <span class="token string">'nearest'</span><span class="token punctuation">,</span>
+
+<span class="token string">'z_score'</span><span class="token punctuation">:</span> <span class="token number">2.5</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<h3 id="text-and-categorical-processing">Text and Categorical Processing</h3>
+<pre class=" language-python"><code class="prism  language-python">
+<span class="token comment"># Comprehensive text analysis</span>
+
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'standardize_text'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+
+<span class="token string">'text_uniqueness_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.95</span><span class="token punctuation">,</span>
+
+<span class="token string">'text_min_length'</span><span class="token punctuation">:</span> <span class="token number">50</span><span class="token punctuation">,</span>
+
+<span class="token string">'null_strategy'</span><span class="token punctuation">:</span> <span class="token string">'drop'</span>
+
+<span class="token punctuation">}</span>
+
+  
+
+<span class="token comment"># Efficient categorical handling</span>
+
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'cardinality_action'</span><span class="token punctuation">:</span> <span class="token string">'group'</span><span class="token punctuation">,</span>
+
+<span class="token string">'max_cardinality_ratio'</span><span class="token punctuation">:</span> <span class="token number">0.02</span><span class="token punctuation">,</span>
+
+<span class="token string">'encode_method'</span><span class="token punctuation">:</span> <span class="token string">'binary'</span><span class="token punctuation">,</span>
+
+<span class="token string">'explode_columns'</span><span class="token punctuation">:</span> <span class="token boolean">True</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+<h3 id="advanced-feature-engineering">Advanced Feature Engineering</h3>
+<pre class=" language-python"><code class="prism  language-python">
+<span class="token comment"># Complex feature generation</span>
+
+config <span class="token operator">=</span> <span class="token punctuation">{</span>
+
+<span class="token string">'enable_polynomial_features'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+
+<span class="token string">'polynomial_degree'</span><span class="token punctuation">:</span> <span class="token number">3</span><span class="token punctuation">,</span>
+
+<span class="token string">'enable_interaction_terms'</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+
+<span class="token string">'scaling_method'</span><span class="token punctuation">:</span> <span class="token string">'standard'</span>
+
+<span class="token punctuation">}</span>
+
+</code></pre>
+</div>
+</body>
+
+</html>
